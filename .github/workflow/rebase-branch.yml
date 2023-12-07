@@ -1,0 +1,40 @@
+name: Prepare branch RC
+
+on:
+  workflow_dispatch:
+
+jobs:
+  main:
+    name: Prepare RC
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.branch }}
+
+      - name: Rebase branch with RC
+        run: |
+          git config --global user.email "${GITHUB_ACTOR}"
+          git config --global user.name "${GITHUB_ACTOR}@users.noreply.github.com"
+          git status
+          git pull
+          git checkout rc
+          git status
+          git checkout ${{ github.branch }}
+          git rebase rc
+          git commit -m "chore: rebase with rc (${{ steps.short-sha.outputs.sha }})"
+          git push origin ${{ github.branch }}
+
+      - name: Merge branch to RC
+        - name: Rebase branch with RC
+        run: |
+          git config --global user.email "${GITHUB_ACTOR}"
+          git config --global user.name "${GITHUB_ACTOR}@users.noreply.github.com"
+          git status
+          git pull
+          git checkout rc
+          git status
+          git merge --squash ${{ github.branch }}
+          git commit -m "chore: merge branch (${{ github.branch }}) (${{ steps.short-sha.outputs.sha }})"
+          git push origin rc

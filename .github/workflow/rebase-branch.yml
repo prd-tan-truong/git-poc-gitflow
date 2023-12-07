@@ -1,7 +1,6 @@
 name: Prepare branch RC
 
-on:
-  workflow_dispatch:
+on: workflow_dispatch
 
 jobs:
   main:

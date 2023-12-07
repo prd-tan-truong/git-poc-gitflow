@@ -10,7 +10,11 @@ jobs:
       - name: Checkout branch
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.branch }}
+          ref: ${{ github.ref }}
+
+      - name: Set outputs
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
       - name: Rebase branch with RC
         run: |
@@ -20,10 +24,10 @@ jobs:
           git pull
           git checkout rc
           git status
-          git checkout ${{ github.branch }}
+          git checkout ${{ github.ref }}
           git rebase rc
-          git commit -m "chore: rebase with rc (${{ steps.short-sha.outputs.sha }})"
-          git push origin ${{ github.branch }}
+          git commit -m "chore: rebase with rc (${{ steps.vars.outputs.sha_short }})"
+          git push origin ${{ github.ref }}
 
       - name: Merge branch to RC
         run: |
@@ -33,6 +37,6 @@ jobs:
           git pull
           git checkout rc
           git status
-          git merge --squash ${{ github.branch }}
-          git commit -m "chore: merge branch (${{ github.branch }}) (${{ steps.short-sha.outputs.sha }})"
+          git merge --squash ${{ github.ref }}
+          git commit -m "chore: merge branch (${{ github.ref }}) (${{ steps.vars.outputs.sha_short }})"
           git push origin rc

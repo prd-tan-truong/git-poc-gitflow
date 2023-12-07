@@ -2,6 +2,9 @@ name: Prepare branch RC
 
 on: workflow_dispatch
 
+permissions:
+  contents: write
+
 jobs:
   main:
     name: Prepare RC
@@ -11,28 +14,30 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: ${{ github.ref }}
+          fetch-depth: 0
 
       - name: Set outputs
         id: vars
         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
-      - name: Rebase branch with RC
+      - name: Set up git
         run: |
           git config --global user.email "${GITHUB_ACTOR}"
           git config --global user.name "${GITHUB_ACTOR}@users.noreply.github.com"
-          git status
-          git pull
-          git checkout rc
-          git status
-          git checkout ${{ github.ref }}
-          git rebase rc
-          git commit -m "chore: rebase with rc (${{ steps.vars.outputs.sha_short }})"
-          git push --force origin ${{ github.ref }}
+
+      # - name: Rebase branch with RC
+      #   run: |
+      #     git status
+      #     git pull
+      #     git checkout rc
+      #     git status
+      #     git checkout ${{ github.ref }}
+      #     git rebase rc
+      #     git commit -m "chore: rebase with rc (${{ steps.vars.outputs.sha_short }})"
+      #     git push --force origin ${{ github.ref }}
 
       - name: Merge branch to RC
         run: |
-          git config --global user.email "${GITHUB_ACTOR}"
-          git config --global user.name "${GITHUB_ACTOR}@users.noreply.github.com"
           git status
           git pull
           git checkout rc

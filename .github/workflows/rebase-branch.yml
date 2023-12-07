@@ -25,16 +25,12 @@ jobs:
           git config --global user.email "${GITHUB_ACTOR}"
           git config --global user.name "${GITHUB_ACTOR}@users.noreply.github.com"
 
-      # - name: Rebase branch with RC
-      #   run: |
-      #     git status
-      #     git pull
-      #     git checkout rc
-      #     git status
-      #     git checkout ${{ github.ref }}
-      #     git rebase rc
-      #     git commit -m "chore: rebase with rc (${{ steps.vars.outputs.sha_short }})"
-      #     git push --force origin ${{ github.ref }}
+      - name: Rebase branch with RC
+        run: |
+          git status
+          git pull --rebase origin rc
+          git commit -m "chore: rebase with rc (${{ steps.vars.outputs.sha_short }})"
+          git push --force origin ${{ github.ref }}
 
       - name: Merge branch to RC
         run: |

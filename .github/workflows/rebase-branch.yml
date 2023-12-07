@@ -29,8 +29,13 @@ jobs:
         run: |
           git status
           git pull --rebase origin rc
-          git commit -m "chore: rebase with rc (${{ steps.vars.outputs.sha_short }})"
-          git push --force origin ${{ github.ref }}
+          if [[ `git status --porcelain` ]]; then
+            echo "OK: Changes detected."
+            git commit -m "chore: rebase with rc (${{ steps.vars.outputs.sha_short }})"
+            git push --force origin ${{ github.ref }}
+          else
+            echo "WARNING: No changes were detected."
+          fi
 
       - name: Merge branch to RC
         run: |
